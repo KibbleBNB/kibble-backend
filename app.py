@@ -51,7 +51,7 @@ def twitter_auth():
     return redirect(auth_url)
 
 
-# ===============  CALLBACK TWITTER  (corrigé) ===============
+# ===============  CALLBACK TWITTER (corrigé) ===============
 @app.route('/twitter/callback')
 def twitter_callback():
     code = request.args.get("code")
@@ -61,20 +61,18 @@ def twitter_callback():
     code_verifier = session.get("code_verifier")
     token_url = "https://api.twitter.com/2/oauth2/token"
 
-    # ✅ Encodage correct du payload
-    payload = (
-        f"code={code}"
-        f"&grant_type=authorization_code"
-        f"&client_id={CLIENT_ID}"
-        f"&redirect_uri={REDIRECT_URI}"
-        f"&code_verifier={code_verifier}"
-    )
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
+    # ✅ Correction : envoi d'un dictionnaire pour un encodage automatique correct
+    payload = {
+        "code": code,
+        "grant_type": "authorization_code",
+        "client_id": CLIENT_ID,
+        "redirect_uri": REDIRECT_URI,
+        "code_verifier": code_verifier
     }
 
-    response = requests.post(token_url, headers=headers, data=payload)
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+    response = requests.post(token_url, data=payload, headers=headers)
 
     if response.status_code != 200:
         return f"Token exchange failed: {response.text}", 400
